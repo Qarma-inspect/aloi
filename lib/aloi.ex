@@ -101,14 +101,12 @@ defmodule Aloi do
 
     quote do
       @spec unquote(function_name)(unquote_splicing(typespec_args)) :: unquote(return_type)
-      if is_nil(@aloi_config_implementation) do
-        def unquote(function_name)(unquote_splicing(args)) do
+      def unquote(function_name)(unquote_splicing(args)) do
+        if apply(Kernel, :==, [@aloi_config_implementation, nil]) do
           raise "Attempt to call aloi #{inspect(__MODULE__)} with no defined implementation"
         end
-      else
-        def unquote(function_name)(unquote_splicing(args)) do
-          apply(@aloi_config_implementation, unquote(function_name), [unquote_splicing(args)])
-        end
+
+        apply(@aloi_config_implementation, unquote(function_name), [unquote_splicing(args)])
       end
 
       @callback unquote(a)
