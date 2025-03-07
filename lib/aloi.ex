@@ -52,13 +52,13 @@ defmodule Aloi do
                                 |> Keyword.get(:no_implementation, false)
 
       @local_dispatch_disabled unquote(otp_app)
-                        |> Application.compile_env(__MODULE__, [])
-                        |> Keyword.get(:no_implementation, false)
+                               |> Application.compile_env(__MODULE__, [])
+                               |> Keyword.get(:no_implementation, false)
 
       if not (@local_dispatch_disabled or @global_dispatch_disabled) and is_nil(@aloi_config_implementation) do
-        raise "No compile-time implementation provided for #{inspect(__MODULE__)}. " <> 
-              "Please provide one by adding the following line to your config.exs: " <>
-              "'config :#{unquote(otp_app)}, #{inspect(__MODULE__)}, implementation: <IMPL>'"
+        raise "No compile-time implementation provided for #{inspect(__MODULE__)}. " <>
+                "Please provide one by adding the following line to your config.exs: " <>
+                "'config :#{unquote(otp_app)}, #{inspect(__MODULE__)}, implementation: <IMPL>'"
       end
 
       unquote(callbacks)
@@ -72,12 +72,13 @@ defmodule Aloi do
 
     for {function_name, arity} <- behaviour_info do
       args = 0..arity |> Enum.to_list() |> tl() |> Enum.map(&Macro.var(:"arg#{&1}", Elixir))
-      
+
       quote do
         def unquote(function_name)(unquote_splicing(args)) do
           if is_nil(@aloi_config_implementation) do
             raise "Attempt to call aloi #{inspect(__MODULE__)} with no defined implementation"
           end
+
           apply(@aloi_config_implementation, unquote(function_name), [unquote_splicing(args)])
         end
       end
@@ -100,11 +101,14 @@ defmodule Aloi do
 
     quote do
       @spec unquote(function_name)(unquote_splicing(typespec_args)) :: unquote(return_type)
-      def unquote(function_name)(unquote_splicing(args)) do
-        if is_nil(@aloi_config_implementation) do
+      if is_nil(@aloi_config_implementation) do
+        def unquote(function_name)(unquote_splicing(args)) do
           raise "Attempt to call aloi #{inspect(__MODULE__)} with no defined implementation"
         end
-        apply(@aloi_config_implementation, unquote(function_name), [unquote_splicing(args)])
+      else
+        def unquote(function_name)(unquote_splicing(args)) do
+          apply(@aloi_config_implementation, unquote(function_name), [unquote_splicing(args)])
+        end
       end
 
       @callback unquote(a)
