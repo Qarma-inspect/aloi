@@ -1,6 +1,6 @@
 # Aloi - Another Layer of Indirection
 
-Aloi - `Another layer of indirection` - provides a way to define "proxy" module layer that delegates all its callbacks to another module, which can be defined in config or use a default implementation.
+Aloi - `Another layer of indirection` - provides a way to define "proxy" module layer that delegates all its callbacks to another module, which can be defined in config.
 
 It can be useful when you want to have a module that can be easily swapped with a specific implementation, or to disconnect the module from the implementation details in microservices architecture, so no compile-time dependencies arise.
 
@@ -21,6 +21,9 @@ defmodule MyModule do
 end
 
 defmodule MyImplementation do
+  @behaviour MyModule
+
+  @impl true
   def my_check(_arg1, _arg2) do
     # some implementation
 
