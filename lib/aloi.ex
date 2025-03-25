@@ -57,8 +57,8 @@ defmodule Aloi do
 
       if not (@local_dispatch_disabled or @global_dispatch_disabled) and is_nil(@aloi_config_implementation) do
         raise "No compile-time implementation provided for #{inspect(__MODULE__)}. " <>
-                "Please provide one by adding the following line to your config.exs: " <>
-                "'config :#{unquote(otp_app)}, #{inspect(__MODULE__)}, implementation: <IMPL>'"
+                "Please provide one by adding the following line to your config.exs:\n\n" <>
+                "    config :#{unquote(otp_app)}, #{inspect(__MODULE__)}, implementation: <IMPL>\n\n"
       end
 
       unquote(callbacks)
